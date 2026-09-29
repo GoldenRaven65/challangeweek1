@@ -161,18 +161,18 @@ def print_random_character():
 
 def play_game():
 	total_points = 0
-	failed_times = 3
+	lives = 3
 	round_number = 0
 
-	while failed_times > 0:
+	while lives > 0:
 		round_number += 1
 		print(f"\n--- Ronde {round_number} ---")
 		points = print_random_character()
 		total_points += points
 
 		if points < 0:
-			failed_times -= 1
-			print(f"Levens over: {failed_times}")
+			lives -= 1
+			print(f"Levens over: {lives}")
 		else:
 			print("Gelukt!")
 
