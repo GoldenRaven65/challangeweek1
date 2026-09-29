@@ -14,11 +14,12 @@ characters = [
 		"anomaly": False,
 	},
 	{
-		"name": "Elara Finch",
+		"name": "Elara blub Finch",
 		"appearance": "Wild curly red hair, mismatched round glasses, and a coat patched with scraps of curtain fabric",
 		"job": "Botanist",
 		"order": "",
-		"anomaly": True,
+		"anomaly": True, 
+        #hoi
 	},
 	{
 		"name": "Theo Marsh",
