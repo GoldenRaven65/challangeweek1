@@ -71,7 +71,7 @@ characters = [
 	},
 	{
 		"name": "Felix Crow",
-		"appearance": "Lean figure, oversized dark hood, crooked grin, and a coat lined with mismatched pockets"
+		"appearance": "Lean figure, oversized dark hood, crooked grin, and a coat lined with mismatched pockets",
 		"order": "",
 		"anomaly": True,
 	},
@@ -136,7 +136,7 @@ def print_random_character():
 	character = random.choice(characters)
 	print(f"Name: {character['name']}")
 	print(f"Appearance: {character['appearance']}")
-	print(f"Job: {character['job']}")
+
 
 	wants_order = input("Wil je hun order weten? Typ 'ja' of 'nee': ")
 	if wants_order.strip().lower() in ("ja", "order"):
@@ -161,18 +161,18 @@ def print_random_character():
 
 def play_game():
 	total_points = 0
-	failed_times = 0
+	failed_times = 3
 	round_number = 0
 
-	while failed_times < 3:
+	while failed_times > 0:
 		round_number += 1
 		print(f"\n--- Ronde {round_number} ---")
 		points = print_random_character()
 		total_points += points
 
 		if points < 0:
-			failed_times += 1
-			print(f"Mislukt: {failed_times}/3")
+			failed_times -= 1
+			print(f"Levens over: {failed_times}")
 		else:
 			print("Gelukt!")
 
