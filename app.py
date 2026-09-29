@@ -1,3 +1,6 @@
+import random
+
+
 characters = [
 	{
 		"name": "Mira Vale",
@@ -141,3 +144,64 @@ characters = [
 		"anomaly": False,
 	},
 ]
+
+
+def calculate_points(character, action):
+	if action == "maken":
+		return -10 if character["anomaly"] else 5
+	return 3 if character["anomaly"] else -5
+
+
+def print_random_character():
+	character = random.choice(characters)
+	print(f"Name: {character['name']}")
+	print(f"Appearance: {character['appearance']}")
+	print(f"Job: {character['job']}")
+
+	wants_order = input("Wil je hun order weten? Typ 'ja' of 'nee': ")
+	if wants_order.strip().lower() in ("ja", "order"):
+		order = character["order"] or "Geen order toegewezen"
+		print(f"Order: {order}")
+		action = input("Wil je de order maken of het personage wegsturen? ")
+		action = action.strip().lower()
+		if action not in ("maken", "wegsturen"):
+			action = "wegsturen"
+	else:
+		print("Je wilt de order niet. Het personage wordt weggestuurd.")
+		action = "wegsturen"
+
+	points = calculate_points(character, action)
+	if action == "maken":
+		print("De order wordt gemaakt.")
+	else:
+		print("Het personage wordt weggestuurd.")
+	print(f"Punten: {points:+d}")
+	return points
+
+
+def play_game():
+	total_points = 0
+	failed_times = 0
+	round_number = 0
+
+	while failed_times < 3:
+		round_number += 1
+		print(f"\n--- Ronde {round_number} ---")
+		points = print_random_character()
+		total_points += points
+
+		if points < 0:
+			failed_times += 1
+			print(f"Mislukt: {failed_times}/3")
+		else:
+			print("Gelukt!")
+
+		print(f"Totale punten: {total_points:+d}")
+
+	print("Je hebt 3 keer gefaald. Het spel is voorbij.")
+	print(f"Eindscore: {total_points:+d}")
+
+
+if __name__ == "__main__":
+	play_game()
+
