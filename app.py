@@ -14,7 +14,7 @@ characters = [
 		"anomaly": False,
 	},
 	{
-		"name": "Elara blub Finch",
+		"name": "Elara Finch",
 		"appearance": "Wild curly red hair, mismatched round glasses, and a coat patched with scraps of curtain fabric",
 		"job": "Botanist",
 		"order": "",
