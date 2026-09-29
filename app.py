@@ -16,25 +16,25 @@ except ImportError:
 # Lijst met personages en hun bijbehorende bestellingen.
 # Elk personage heeft een beschrijving, een vlag voor afwijkend gedrag en een order.
 characters = [
-    {"name": "Mira Vale", "appearance": "Kort zwart haar en een blauwe jas met vreemde symbolen", "anomaly": True, "order": "Een frikandel speciaal zonder frikandel, maar wel met drie staafjes mayo."},
-    {"name": "Jonas Reed", "appearance": "Lang en breedgeschouderd, met een bruine baard en één grote handschoen", "anomaly": False, "order": "Een grote friet met mayo en een kroket."},
-    {"name": "Elara Finch", "appearance": "Krullend rood haar, een ronde bril en een opgelapte jas", "anomaly": True, "order": "Een kapsalon, maar alle lagen moeten naast elkaar in aparte bakjes liggen."},
-    {"name": "Theo Marsh", "appearance": "Een gele regenjas, drie verschillende sokken en een papieren hoed", "anomaly": True, "order": "Een kaassouffle gevuld met friet en een klein parapluutje."},
+    {"name": "Mira Vale", "appearance": "Kort zwart haar en een blauwe jas. Haar schaduw ontbreekt volledig.", "anomaly": True, "order": "Een frikandel speciaal zonder frikandel, maar wel met drie staafjes mayo."},
+    {"name": "Jonas Reed", "appearance": "Lang en breedgeschouderd, met een bruine baard en twee normale handen.", "anomaly": False, "order": "Een grote friet met mayo en een kroket."},
+    {"name": "Elara Finch", "appearance": "Krullend rood haar en een ronde bril. Ze knippert steeds met haar ogen tegelijk.", "anomaly": True, "order": "Een kapsalon, maar alle lagen moeten naast elkaar in aparte bakjes liggen."},
+    {"name": "Theo Marsh", "appearance": "Een gele regenjas en een papieren hoed. Zijn hoofd draait soms helemaal rond.", "anomaly": True, "order": "Een kaassouffle gevuld met friet en een klein parapluutje."},
     {"name": "Sana Okafor", "appearance": "Donker gevlochten haar, een rafelige sjaal en een zilveren ketting", "anomaly": False, "order": "Een broodje kipburger met sla en knoflooksaus."},
-    {"name": "Bram Hollow", "appearance": "Grote lichaamsbouw, kaal hoofd, een wenkbrauw met litteken en een oud harnas", "anomaly": False, "order": "Een dubbele cheeseburger met een kleine friet."},
-    {"name": "Lydia Snow", "appearance": "Wit haar, felblauwe ogen en een gerepareerde paarse jurk", "anomaly": True, "order": "Een ijsje dat warm moet zijn, met mosterd als topping."},
-    {"name": "Kai Mercer", "appearance": "Slordig blond haar, versleten sneakers en een rugzak vol kaarten", "anomaly": False, "order": "Een mexicano met pindasaus en een blikje cola."},
-    {"name": "Nora Bell", "appearance": "Warme glimlach, met bloem bestoven haar en een schort vol sleutels", "anomaly": True, "order": "Een patatje oorlog zonder patat, graag in een schoenendoos."},
-    {"name": "Orin Glass", "appearance": "Zilverkleurig haar, smalle ogen en een zwarte mantel met verschroeide randen", "anomaly": True, "order": "Een milkshake met frietsaus, extra heet, en zonder beker."},
+    {"name": "Bram Hollow", "appearance": "Grote lichaamsbouw, kaal hoofd en een litteken boven zijn rechteroog. Alles ziet er normaal uit.", "anomaly": False, "order": "Een dubbele cheeseburger met een kleine friet."},
+    {"name": "Lydia Snow", "appearance": "Wit haar en felblauwe ogen. Ze heeft een extra arm die onder haar jas vandaan komt.", "anomaly": True, "order": "Een ijsje dat warm moet zijn, met mosterd als topping."},
+    {"name": "Kai Mercer", "appearance": "Slordig blond haar, versleten sneakers en een rugzak vol kaarten. Hij loopt normaal.", "anomaly": False, "order": "Een mexicano met pindasaus en een blikje cola."},
+    {"name": "Nora Bell", "appearance": "Warme glimlach en een schort vol sleutels. Haar mond beweegt niet wanneer ze praat.", "anomaly": True, "order": "Een patatje oorlog zonder patat, graag in een schoenendoos."},
+    {"name": "Orin Glass", "appearance": "Zilverkleurig haar en een zwarte mantel. Zijn voeten raken de grond niet.", "anomaly": True, "order": "Een milkshake met frietsaus, extra heet, en zonder beker."},
     {"name": "Pia Wren", "appearance": "Groen bobkapsel, veel te grote laarzen en een jas vol speldjes", "anomaly": False, "order": "Een berenhap met pindasaus en een kleine cola."},
     {"name": "Daan Voss", "appearance": "Netjes donker haar, een ronde hoed en een notitieboek vol schetsen", "anomaly": False, "order": "Een portie friet met ketchup en een kipcorn."},
-    {"name": "Iris Crowe", "appearance": "Lange zilveren vlecht, verschillende oorbellen en een fluwelen jas", "anomaly": True, "order": "Een frikandel die eerst drie rondjes om de snackbar moet lopen."},
-    {"name": "Milo Hart", "appearance": "Sproeten, een gestreepte trui en felrode koptelefoon", "anomaly": False, "order": "Een cheeseburger zonder kaas en een medium friet."},
-    {"name": "Fenna Rook", "appearance": "Zijkant van het hoofd kaalgeschoren, gele sjaal en laarzen met sterren", "anomaly": True, "order": "Een softijsje met augurken, maar alleen de schaduw ervan."},
+    {"name": "Iris Crowe", "appearance": "Lange zilveren vlecht en verschillende oorbellen. Ze beweegt achteruit terwijl ze vooruit loopt.", "anomaly": True, "order": "Een frikandel die eerst drie rondjes om de snackbar moet lopen."},
+    {"name": "Milo Hart", "appearance": "Sproeten, een gestreepte trui en felrode koptelefoon. Hij heeft een gewone schaduw.", "anomaly": False, "order": "Een cheeseburger zonder kaas en een medium friet."},
+    {"name": "Fenna Rook", "appearance": "Gele sjaal en laarzen met sterren. Haar spiegelbeeld kijkt een andere kant op.", "anomaly": True, "order": "Een softijsje met augurken, maar alleen de schaduw ervan."},
     {"name": "Ravi Stone", "appearance": "Krullend zwart haar, leren handschoenen en een rugzak vol snacks", "anomaly": False, "order": "Een broodje mexicano met curry en uitjes."},
-    {"name": "June Alder", "appearance": "Lichtblauw haar, een lange jas en een zakhorloge", "anomaly": True, "order": "Een portie friet die achteruit gebakken en bevroren geserveerd wordt."},
+    {"name": "June Alder", "appearance": "Lichtblauw haar, een lange jas en een zakhorloge. Haar stem klinkt vertraagd na elke beweging.", "anomaly": True, "order": "Een portie friet die achteruit gebakken en bevroren geserveerd wordt."},
     {"name": "Sven Pike", "appearance": "Stekelig bruin haar, een sportshirt en één neon veter", "anomaly": False, "order": "Een bamischijf met chilisaus en een blikje sinas."},
-    {"name": "Mae Rowan", "appearance": "Warme bruine krullen, een bril met stervormige glazen en een rode regenjas", "anomaly": True, "order": "Een hamburger zonder broodje, vlees of groente, maar wel met extra kaas."},
+    {"name": "Mae Rowan", "appearance": "Warme bruine krullen en een rode regenjas. Haar ogen kijken onafhankelijk van elkaar.", "anomaly": True, "order": "Een hamburger zonder broodje, vlees of groente, maar wel met extra kaas."},
     {"name": "Tobias Quill", "appearance": "Lang en dun, met een witte sjaal en met inkt bevlekte vingers", "anomaly": False, "order": "Een grote friet speciaal en een kaassouffle."},
 ]
 
@@ -165,6 +165,20 @@ class OrderKeeper:
 
     def show_order(self):
         self.order_shown = True
+        if self.character["anomaly"] and random.random() < 1 / 3:
+            self.lives -= 1
+            self.order_button.config(text="Aangevallen!", state="disabled", bg="#5d302d", fg="#f5eadb")
+            self.make_button.config(state="disabled")
+            self.send_button.config(state="disabled")
+            self.message.config(text="De anomaly valt je direct aan!", fg="#f0a39b")
+            self.lose_life_effect()
+            self.update_info()
+            if self.lives == 0:
+                self.root.after(700, self.game_over)
+            else:
+                self.root.after(700, self.next_round)
+            return
+
         self.order_label.config(text=f"Order: {self.character['order']}", fg="#b3d2b1")
         self.order_button.config(text="Order bekeken", state="disabled", bg="#5d473f", fg="#f5eadb")
         self.make_button.config(state="normal", bg="#4b6f61", fg="#f2efe8")
