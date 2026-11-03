@@ -2,6 +2,7 @@ class Settings:
     WIDTH = 1000
     HEIGHT = 700
     FPS = 60
+    TYPING_SPEED = 35
 
     BACKGROUND_COLOR = (25, 25, 35)
     TEXT_COLOR = (240, 240, 240)

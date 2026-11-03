@@ -1,4 +1,6 @@
 import random
+from pathlib import Path
+
 import pygame
 
 from characters import characters
@@ -12,13 +14,15 @@ class Game:
         self.font = pygame.font.Font(None, 32)
         self.small_font = pygame.font.Font(None, 26)
         self.username = ""
+        self.background = self.load_background()
 
         self.characters = self.load_characters()
-        self.current_character = random.choice(self.characters)
+        self.remaining_characters = self.characters.copy()
+        self.current_character = self.take_next_character()
         self.message = "Wil je deze klant bedienen? Typ ja of nee en druk op Enter."
         self.visible_appearance = ""
         self.visible_message = ""
-        self.typing_speed = 35
+        self.typing_speed = self.settings.TYPING_SPEED
         self.typing_timer = 0
         self.answer = ""
         self.finished = False
@@ -29,8 +33,40 @@ class Game:
         self.cutscene_index = 0
         self.cutscene_visible = ""
         self.cutscene_timer = 0
+        self.night_event_active = False
+        self.night_event_lines = []
+        self.night_event_index = 0
+        self.night_event_visible = ""
+        self.night_event_timer = 0
+        self.night_event_waiting_choice = False
+        self.night_event_answer = ""
+        self.night_event_choice_completed = False
 
         self.start_typing(self.current_character["appearance"], self.message)
+
+    def load_background(self):
+        image_path = (
+            Path(__file__).resolve().parent.parent
+            / "exec-4ab69568-c07e-47c0-92c5-956f14df3e1d.png"
+        )
+        try:
+            image = pygame.image.load(image_path).convert()
+            return pygame.transform.smoothscale(
+                image,
+                (self.settings.WIDTH, self.settings.HEIGHT),
+            )
+        except (FileNotFoundError, pygame.error):
+            return None
+
+    def draw_background(self):
+        self.screen.fill(self.settings.BACKGROUND_COLOR)
+        if self.background is None:
+            return
+
+        self.screen.blit(self.background, (0, 0))
+        overlay = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 145))
+        self.screen.blit(overlay, (0, 0))
 
     def start_typing(self, appearance, message):
         self.current_character["display_appearance"] = appearance
@@ -66,6 +102,40 @@ class Game:
         self.cutscene_visible = ""
         self.cutscene_timer = 0
 
+    def start_night_event(self):
+        self.night_event_active = True
+        self.night_event_lines = [
+            "Je telefoon trilt. Je collega belt.",
+            '“Luister. Ik ben mijn telefoon vergeten. Maar als iemand—”',
+            "Drie harde klappen tegen de achterdeur.",
+            'Achter de deur: “Doe open! Ik ben het!”',
+            'Door de telefoon fluistert diezelfde stem: “Niet opendoen.”',
+            "De deurklink gaat langzaam omlaag.",
+        ]
+        self.night_event_index = 0
+        self.night_event_visible = ""
+        self.night_event_timer = 0
+        self.night_event_waiting_choice = False
+        self.night_event_answer = ""
+        self.night_event_choice_completed = False
+
+    def update_night_event(self):
+        if self.night_event_waiting_choice:
+            return
+
+        if self.night_event_index >= len(self.night_event_lines):
+            self.night_event_waiting_choice = True
+            return
+
+        if self.night_event_timer < self.typing_speed:
+            self.night_event_timer += 1000 / self.settings.FPS
+            return
+
+        self.night_event_timer = 0
+        line = self.night_event_lines[self.night_event_index]
+        next_index = len(self.night_event_visible) + 1
+        self.night_event_visible = line[:next_index]
+
     def update_cutscene(self):
         if self.cutscene_index >= len(self.cutscene_lines):
             return
@@ -82,11 +152,24 @@ class Game:
     def load_characters(self):
         return characters
 
+    def take_next_character(self):
+        character_index = random.randrange(len(self.remaining_characters))
+        return self.remaining_characters.pop(character_index)
+
     def handle_event(self, event):
         if event.type != pygame.KEYDOWN:
             return
 
+        if self.night_event_active:
+            self.handle_night_event(event)
+            return
+
         if self.work_finished:
+            if event.key == pygame.K_ESCAPE:
+                self.cutscene_index = len(self.cutscene_lines)
+                self.cutscene_visible = ""
+                return
+
             if event.key not in (pygame.K_RETURN, pygame.K_SPACE):
                 return
 
@@ -106,7 +189,10 @@ class Game:
             return
 
         if event.key == pygame.K_SPACE and self.finished:
-            self.current_character = random.choice(self.characters)
+            if not self.remaining_characters:
+                return
+
+            self.current_character = self.take_next_character()
             self.message = "Wil je deze klant bedienen? Typ ja of nee en druk op Enter."
             self.answer = ""
             self.start_typing(self.current_character["appearance"], self.message)
@@ -133,6 +219,66 @@ class Game:
         if event.unicode.isalpha() and len(self.answer) < 3:
             self.answer += event.unicode.lower()
 
+    def handle_night_event(self, event):
+        if self.night_event_waiting_choice:
+            if event.key == pygame.K_BACKSPACE:
+                self.night_event_answer = self.night_event_answer[:-1]
+            elif event.key == pygame.K_RETURN:
+                choice = self.night_event_answer.strip().lower()
+                if choice in ("ja", "j", "yes", "y"):
+                    self.night_event_lines.append(
+                        "Je draait het slot om. Je collega glipt naar binnen en gooit de deur dicht."
+                    )
+                    self.night_event_lines.append('“Waarom deed je open?! De deur moet op slot blijven!!!”')
+                    self.night_event_lines.append("Dan ziet ze je telefoon.")
+                    self.night_event_lines.append('“Met wie bel je?”')
+                    self.night_event_lines.append("De verbinding wordt verbroken.")
+                    self.night_event_answer = ""
+                    self.night_event_choice_completed = True
+                    self.night_event_waiting_choice = False
+                    self.night_event_index = len(self.night_event_lines) - 5
+                    self.night_event_visible = ""
+                    self.night_event_timer = 0
+                elif choice in ("nee", "n", "no"):
+                    self.night_event_lines.append(
+                        "Je hoort een sleutel in het slot. Je collega stapt binnen."
+                    )
+                    self.night_event_lines.append('“Goed zo. Jij overleeft het wel,” lacht ze.')
+                    self.night_event_lines.append(
+                        "Ze pakt haar telefoon van onder de toonbank."
+                    )
+                    self.night_event_lines.append(
+                        "Jouw telefoon ligt nog tegen je oor. Je hoort iemand ademhalen."
+                    )
+                    self.night_event_lines.append('“Hup, weer aan het werk.”')
+                    self.night_event_answer = ""
+                    self.night_event_choice_completed = True
+                    self.night_event_waiting_choice = False
+                    self.night_event_index = len(self.night_event_lines) - 5
+                    self.night_event_visible = ""
+                    self.night_event_timer = 0
+            elif event.unicode.isalpha() and len(self.night_event_answer) < 3:
+                self.night_event_answer += event.unicode.lower()
+            return
+
+        if event.key not in (pygame.K_RETURN, pygame.K_SPACE):
+            return
+
+        line = self.night_event_lines[self.night_event_index]
+        if len(self.night_event_visible) < len(line):
+            self.night_event_visible = line
+            return
+
+        self.night_event_index += 1
+        self.night_event_visible = ""
+        self.night_event_timer = 0
+        if self.night_event_index >= len(self.night_event_lines):
+            if self.night_event_choice_completed:
+                self.night_event_active = False
+                self.finished = True
+            else:
+                self.night_event_waiting_choice = True
+
     def choose_answer(self, serves_customer):
         if serves_customer:
             if self.current_character["anomaly"]:
@@ -148,10 +294,17 @@ class Game:
             self.finished = True
 
         self.customers_completed += 1
-        if self.customers_completed % 3 == 0:
-            self.current_hour += 1
+        if self.customers_completed == 1:
+            self.start_night_event()
+            return
 
-        if self.current_hour >= 6:
+        self.current_hour = min(
+            6,
+            self.customers_completed * 6 // len(self.characters),
+        )
+
+        if not self.remaining_characters:
+            self.current_hour = 6
             self.start_cutscene()
             return
 
@@ -162,6 +315,8 @@ class Game:
         self.clock.tick(self.settings.FPS)
         if self.work_finished:
             self.update_cutscene()
+        elif self.night_event_active:
+            self.update_night_event()
         else:
             self.update_typing()
 
@@ -187,10 +342,14 @@ class Game:
         return y + line_height
 
     def draw(self):
-        self.screen.fill(self.settings.BACKGROUND_COLOR)
+        self.draw_background()
 
         if self.work_finished:
             self.draw_cutscene()
+            return
+
+        if self.night_event_active:
+            self.draw_night_event()
             return
 
         title = self.font.render(
@@ -235,6 +394,39 @@ class Game:
 
         bottom = self.small_font.render(instruction, True, color)
         self.screen.blit(bottom, (40, self.settings.HEIGHT - 55))
+
+    def draw_night_event(self):
+        title = self.font.render(
+            "[00:00] — Achterdeur",
+            True,
+            self.settings.ACCENT_COLOR,
+        )
+        self.screen.blit(title, (40, 35))
+
+        self.draw_wrapped_text(
+            self.night_event_visible,
+            40,
+            120,
+            self.settings.WIDTH - 80,
+            self.small_font,
+        )
+
+        if self.night_event_waiting_choice:
+            instruction = (
+                f"Doe je de achterdeur open? (ja/nee): {self.night_event_answer}"
+            )
+            bottom = self.small_font.render(instruction, True, self.settings.TEXT_COLOR)
+            self.screen.blit(bottom, (40, self.settings.HEIGHT - 55))
+        elif self.night_event_index < len(self.night_event_lines):
+            line = self.night_event_lines[self.night_event_index]
+            if len(self.night_event_visible) == len(line):
+                instruction = "Druk op Enter om verder te gaan"
+                bottom = self.small_font.render(
+                    instruction,
+                    True,
+                    self.settings.ACCENT_COLOR,
+                )
+                self.screen.blit(bottom, (40, self.settings.HEIGHT - 55))
 
     def draw_cutscene(self):
         title = self.font.render(

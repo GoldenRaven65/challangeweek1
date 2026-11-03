@@ -63,6 +63,10 @@ class IntroScene(Scene):
         if event.type != pygame.KEYDOWN:
             return
 
+        if event.key == pygame.K_ESCAPE:
+            self.finished = True
+            return
+
         if event.key not in (pygame.K_RETURN, pygame.K_SPACE):
             return
 
@@ -98,7 +102,7 @@ class IntroScene(Scene):
             self.game.screen.blit(surface, (x, y))
 
     def draw(self):
-        self.game.screen.fill((0, 0, 0))
+        self.game.draw_background()
         if self.finished:
             return
 
@@ -126,7 +130,7 @@ class CharacterInteractionScene(Scene):
         pass
 
     def draw(self):
-        self.game.screen.fill((0, 0, 0))
+        self.game.draw_background()
         character_text = f"{self.character['name']}: {self.character['appearence']}"
         text_surface = self.game.font.render(character_text, True, (255, 255, 255))
         self.game.screen.blit(text_surface, (20, 20))

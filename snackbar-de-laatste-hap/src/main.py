@@ -10,6 +10,7 @@ def main():
     pygame.init()
 
     settings = Settings()
+    fullscreen = False
     screen = pygame.display.set_mode((settings.WIDTH, settings.HEIGHT))
     pygame.display.set_caption("Snackbar De Laatste Hap")
 
@@ -24,6 +25,16 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_F11:
+                fullscreen = not fullscreen
+                display_flags = pygame.FULLSCREEN if fullscreen else 0
+                screen = pygame.display.set_mode(
+                    (settings.WIDTH, settings.HEIGHT),
+                    display_flags,
+                )
+                game.screen = screen
+                continue
 
             if showing_username and event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_BACKSPACE:
@@ -41,7 +52,7 @@ def main():
                 game.handle_event(event)
 
         if showing_username:
-            screen.fill(settings.BACKGROUND_COLOR)
+            game.draw_background()
             title = game.font.render("Welkom bij Snackbar De Laatste Hap", True, settings.ACCENT_COLOR)
             prompt = game.small_font.render("Vul je username in en druk op Enter:", True, settings.TEXT_COLOR)
             name = game.font.render(username, True, settings.TEXT_COLOR)

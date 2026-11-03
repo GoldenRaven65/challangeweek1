@@ -1,0 +1,9 @@
+klinkers = input(str(""))
+
+function(
+    
+
+
+
+
+)
