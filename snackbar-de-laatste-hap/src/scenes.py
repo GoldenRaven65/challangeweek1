@@ -1,5 +1,4 @@
 import pygame
-import pygame
 
 class Scene:
     def __init__(self, game):
@@ -131,7 +130,7 @@ class CharacterInteractionScene(Scene):
 
     def draw(self):
         self.game.draw_background()
-        character_text = f"{self.character['name']}: {self.character['appearence']}"
+        character_text = f"{self.character.name}: {self.character.appearance}"
         text_surface = self.game.font.render(character_text, True, (255, 255, 255))
         self.game.screen.blit(text_surface, (20, 20))
 

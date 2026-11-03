@@ -3,7 +3,11 @@ from pathlib import Path
 
 import pygame
 
-from characters import characters
+from characters import CHARACTERS, Character
+
+
+YES_ANSWERS = {"ja", "j", "yes", "y"}
+NO_ANSWERS = {"nee", "n", "no"}
 
 
 class Game:
@@ -16,8 +20,8 @@ class Game:
         self.username = ""
         self.background = self.load_background()
 
-        self.characters = self.load_characters()
-        self.remaining_characters = self.characters.copy()
+        self.characters = CHARACTERS
+        self.remaining_characters = list(self.characters)
         self.current_character = self.take_next_character()
         self.message = "Wil je deze klant bedienen? Typ ja of nee en druk op Enter."
         self.visible_appearance = ""
@@ -42,7 +46,7 @@ class Game:
         self.night_event_answer = ""
         self.night_event_choice_completed = False
 
-        self.start_typing(self.current_character["appearance"], self.message)
+        self.start_typing(self.current_character.appearance, self.message)
 
     def load_background(self):
         image_path = (
@@ -69,7 +73,7 @@ class Game:
         self.screen.blit(overlay, (0, 0))
 
     def start_typing(self, appearance, message):
-        self.current_character["display_appearance"] = appearance
+        self.display_appearance = appearance
         self.message = message
         self.visible_appearance = ""
         self.visible_message = ""
@@ -81,9 +85,9 @@ class Game:
             return
 
         self.typing_timer = 0
-        if len(self.visible_appearance) < len(self.current_character["display_appearance"]):
+        if len(self.visible_appearance) < len(self.display_appearance):
             next_index = len(self.visible_appearance) + 1
-            self.visible_appearance = self.current_character["display_appearance"][:next_index]
+            self.visible_appearance = self.display_appearance[:next_index]
         elif len(self.visible_message) < len(self.message):
             next_index = len(self.visible_message) + 1
             self.visible_message = self.message[:next_index]
@@ -149,10 +153,7 @@ class Game:
         next_index = len(self.cutscene_visible) + 1
         self.cutscene_visible = line[:next_index]
 
-    def load_characters(self):
-        return characters
-
-    def take_next_character(self):
+    def take_next_character(self) -> Character:
         character_index = random.randrange(len(self.remaining_characters))
         return self.remaining_characters.pop(character_index)
 
@@ -195,7 +196,7 @@ class Game:
             self.current_character = self.take_next_character()
             self.message = "Wil je deze klant bedienen? Typ ja of nee en druk op Enter."
             self.answer = ""
-            self.start_typing(self.current_character["appearance"], self.message)
+            self.start_typing(self.current_character.appearance, self.message)
             self.finished = False
             return
 
@@ -208,10 +209,10 @@ class Game:
 
         if event.key == pygame.K_RETURN:
             choice = self.answer.strip().lower()
-            if choice in ("ja", "j", "yes", "y"):
+            if choice in YES_ANSWERS:
                 self.answer = ""
                 self.choose_answer(True)
-            elif choice in ("nee", "n", "no"):
+            elif choice in NO_ANSWERS:
                 self.answer = ""
                 self.choose_answer(False)
             return
@@ -225,38 +226,26 @@ class Game:
                 self.night_event_answer = self.night_event_answer[:-1]
             elif event.key == pygame.K_RETURN:
                 choice = self.night_event_answer.strip().lower()
-                if choice in ("ja", "j", "yes", "y"):
-                    self.night_event_lines.append(
-                        "Je draait het slot om. Je collega glipt naar binnen en gooit de deur dicht."
+                if choice in YES_ANSWERS:
+                    self.finish_night_event(
+                        [
+                            "Je draait het slot om. Je collega glipt naar binnen en gooit de deur dicht.",
+                            "“Waarom deed je open?! De deur moet op slot blijven!!!”",
+                            "Dan ziet ze je telefoon.",
+                            "“Met wie bel je?”",
+                            "De verbinding wordt verbroken.",
+                        ]
                     )
-                    self.night_event_lines.append('“Waarom deed je open?! De deur moet op slot blijven!!!”')
-                    self.night_event_lines.append("Dan ziet ze je telefoon.")
-                    self.night_event_lines.append('“Met wie bel je?”')
-                    self.night_event_lines.append("De verbinding wordt verbroken.")
-                    self.night_event_answer = ""
-                    self.night_event_choice_completed = True
-                    self.night_event_waiting_choice = False
-                    self.night_event_index = len(self.night_event_lines) - 5
-                    self.night_event_visible = ""
-                    self.night_event_timer = 0
-                elif choice in ("nee", "n", "no"):
-                    self.night_event_lines.append(
-                        "Je hoort een sleutel in het slot. Je collega stapt binnen."
+                elif choice in NO_ANSWERS:
+                    self.finish_night_event(
+                        [
+                            "Je hoort een sleutel in het slot. Je collega stapt binnen.",
+                            "“Goed zo. Jij overleeft het wel,” lacht ze.",
+                            "Ze pakt haar telefoon van onder de toonbank.",
+                            "Jouw telefoon ligt nog tegen je oor. Je hoort iemand ademhalen.",
+                            "“Hup, weer aan het werk.”",
+                        ]
                     )
-                    self.night_event_lines.append('“Goed zo. Jij overleeft het wel,” lacht ze.')
-                    self.night_event_lines.append(
-                        "Ze pakt haar telefoon van onder de toonbank."
-                    )
-                    self.night_event_lines.append(
-                        "Jouw telefoon ligt nog tegen je oor. Je hoort iemand ademhalen."
-                    )
-                    self.night_event_lines.append('“Hup, weer aan het werk.”')
-                    self.night_event_answer = ""
-                    self.night_event_choice_completed = True
-                    self.night_event_waiting_choice = False
-                    self.night_event_index = len(self.night_event_lines) - 5
-                    self.night_event_visible = ""
-                    self.night_event_timer = 0
             elif event.unicode.isalpha() and len(self.night_event_answer) < 3:
                 self.night_event_answer += event.unicode.lower()
             return
@@ -279,15 +268,24 @@ class Game:
             else:
                 self.night_event_waiting_choice = True
 
+    def finish_night_event(self, lines):
+        self.night_event_lines.extend(lines)
+        self.night_event_answer = ""
+        self.night_event_choice_completed = True
+        self.night_event_waiting_choice = False
+        self.night_event_index = len(self.night_event_lines) - len(lines)
+        self.night_event_visible = ""
+        self.night_event_timer = 0
+
     def choose_answer(self, serves_customer):
         if serves_customer:
-            if self.current_character["anomaly"]:
+            if self.current_character.anomaly:
                 self.message = "Je hebt het monster bediend. Je bent opgegeten."
             else:
                 self.message = "Je helpt de klant. Die vertrekt tevreden."
             self.finished = True
         else:
-            if self.current_character["anomaly"]:
+            if self.current_character.anomaly:
                 self.message = "Je weigert het monster. Voorlopig ben je veilig."
             else:
                 self.message = "De klant wordt boos en loopt weg."
@@ -361,7 +359,7 @@ class Game:
 
         y = 110
         name = self.font.render(
-            self.current_character["name"],
+            self.current_character.name,
             True,
             self.settings.TEXT_COLOR,
         )
